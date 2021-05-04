@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root{
+  --green: #83e1d0;
+  --red: #ef7b54;
+  --background: #f8f1e9;
+  --gradient-1: #343e63;
+  --gradient-2: #2a3352;
+}
+
+html{
+  font-size: 10px;
+  font-weight: 300;
+}
+
+body{
+  width: 90vh;
+  margin: 0 auto;
+  background:radial-gradient( var(--gradient-1), var(--gradient-2));
+}
+
+main{
+  text-align: center;
+  background-color: var(--background);
+  border: solid var(--red);
+  border-width: 0 8px 8px 8px;
+  min-height: 80vh;
+  border-radius: 0 0 3rem 3rem;
+  padding: 1rem;
+  color:#1f2933;
+}
+
+h2{
+  font-size: 2.2rem;
+  margin: 8rem 0;
+}
+
+p{
+  font-size: 1.8rem;
+}
+
+.button-wrapper{
+  display: flex;
+  flex-direction: column;
+}
+
+button{
+  border: none;
+  cursor:pointer;
+  background-color: var(--green);
+  padding: 2rem;
+  border-radius: 1rem 1rem 0 0;
+}
+
+button:last-child{
+  background-color: var(--red);
+  border-radius: 0 0 1rem 1rem;
+}
+
+h3{
+  font-size: 2rem;
+}
+
+input{
+  border: 1px solid lightgrey;
+  background-color: transparent;
+  margin:2rem 0;
+  padding: 1rem 0;
+  width: 16rem;
+  text-align: center;
+}
+
+#range{
+  display: flex;
+  background: var(--green);
+  height:50px;
+  padding: 0;
+  margin: 0 0 4rem 0;
+}
+
+#low, #high{
+  background: var(--red);
+}
+
+#space{
+  background: var(--green);
+}
+
+
+#rangeOutput{
+  font-size: 1.6rem;
+}
+
+.stats{
+  text-align: left;
+}
+
+.info{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info span{
+  font-size: 1.6rem;
+}
+
+#newGameButton{
+  border-radius: 0;
+}
+
+.flash{
+  animation: flash 1s infinite;
+}
+
+@keyframes flash{
+  0%{
+    opacity: 1;
+  }
+
+  50%{
+    opacity: 0.5;
+  }
+
+  100%{
+    opacity: 1;
+  }
+}
+
+@media (min-width: 800px){
+  body{
+    width: 60vw;
+  }
+}
+  </style>
+  <title>Document</title>
+</head>
+
+<body onload="init()">
+  <main>
+    <div id="welcomeScreen">
+      <h2>Guess the random number <br> Between 1-100</h2>
+      <section>
+        <p>Select difficulty setting:</p>
+        <div class="button-wrapper">
+          <button onclick="easyMode()">Easy: 10 attempts</button>
+          <button onclick="hardMode()">Hard: 5 attempts</button>
+        </div>
+      </section>
+    </div>
+    <div id="gameArea">
+      <button id="newGameButton" onclick="newGame()">NEW GAME</button>
+      <section>
+        <h3 id="textOutput">Your Guess:</h3>
+        <input type="number" id="inputBox" min="1" max="100" onchange="compareGuess()">
+      </section>
+      <section>
+        <p>Current Range</p>
+        <span id="rangeOutput">1 - 100</span>
+        <div id="range">
+          <span id="low"></span>
+          <span id="space"></span>
+          <span id="high"></span>
+        </div>
+      </section>
+      <section class="stats">
+        <div class="info">
+          <p>Number of previous attempts</p>
+          <span id="attempts">0</span>
+        </div>
+
+        <div class="info">
+          <p>Your previous guesses</p>
+          <span id="guesses">-</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+
+
+
+  <script>
+
+
+let computerGuess;
+let userGuesses = [];
+let attempts = 0;
+let maxGuesses;
+
+let low = 1;
+let high = 100;
+
+function updateRange(){
+  const rangeOutput = document.getElementById("rangeOutput");
+  rangeOutput.innerText = `${low} - ${high}`;
+  rangeOutput.style.marginLeft = low + "%";
+  rangeOutput.style.marginRight = 100 - high + "%";
+  rangeOutput.classList.add("flash");
+
+  const lowValue = document.getElementById("low");
+  lowValue.style.flex = low + "%";
+
+  const spaceValue = document.getElementById("space");
+  spaceValue.style.flex = high - low + "%";
+
+  const highValue = document.getElementById("high");
+  highValue.style.flex = 100 - high + "%";
+}
+
+function newGame(){
+  window.location.reload();
+}
+
+function gameEnded(){
+  document.getElementById("newGameButton").style.display = "inline";
+  document.getElementById('inputBox').setAttribute("readonly","readonly");
+}
+
+function init(){
+  computerGuess = Math.floor(Math.random() * 100 + 1);
+  console.log(computerGuess);
+  document.getElementById("newGameButton").style.display = "none";
+  document.getElementById("gameArea").style.display = "none";
+}
+
+function startGameView(){
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("gameArea").style.display = "block";
+}
+
+function easyMode(){
+  maxGuesses = 10;
+  startGameView();
+}
+
+function hardMode(){
+  maxGuesses = 5;
+  startGameView();
+}
+
+function compareGuess(){
+  const userGuess = Number(document.getElementById("inputBox").value);
+  userGuesses.push(" " + userGuess);
+  document.getElementById("guesses").innerHTML = userGuesses;
+  attempts++;
+  document.getElementById("attempts").innerHTML = attempts;
+
+  if (attempts < maxGuesses) {
+    if (userGuess > computerGuess) {
+      if (userGuess < high) {
+        high = userGuess;
+      }
+      document.getElementById("textOutput").innerHTML = "Your guess is too high";
+      document.getElementById("inputBox").value = "";
+    }else if (userGuess < computerGuess) {
+      if (userGuess > low) {
+        low = userGuess;
+      }
+      document.getElementById("textOutput").innerHTML = "Your guess is too low";
+      document.getElementById("inputBox").value = "";
+    }else{
+      document.getElementById("textOutput").innerHTML = "Correct! You got in " + attempts;
+      gameEnded();
+    }
+  }else{
+    if (userGuess > computerGuess || userGuess < computerGuess) {
+      document.getElementById("textOutput").innerHTML = "YOU LOSE! The number was " + computerGuess;
+      document.getElementById("inputBox").value = "";
+      gameEnded();
+    }else{
+      document.getElementById("textOutput").innerHTML = "Correct! You got in " + attempts;
+      gameEnded();
+    }
+  }
+
+  updateRange();
+}
+  </script>
+</body>
+
+</html>
